@@ -45,10 +45,29 @@
 )
 (define sleepiest-guard (get-sleepiest-guard guard-data))
 (define mins (hash-ref guard-data sleepiest-guard))
-(define counts (hash->list (for/fold ([res (hash)])
-          ([i mins])
-    (hash-update res i (lambda (x) (+ x 1)) 0)
-)))
+
+(define (get-counts input-list)
+    ; return hash table of counts from a list of nums
+    (for/fold ([res (hash)])
+              ([i input-list])
+        (hash-update res i (lambda (x) (+ x 1)) 0))
+)
+(define counts (hash->list (get-counts mins)))
 (* (string->number sleepiest-guard) (car (argmax cdr counts)))
+
+; Part 2
+(define (all-guards-sleepiest-minute guard-data)
+    ; reduce the hash table
+    (define best (cons -1 -1))
+    (define guard -1)
+    (for ([(k v) guard-data])
+        (let ([sleepiest-min (argmax cdr (hash->list (get-counts v)))]) ; BUG need the sleepiest min
+            (when (> (cdr sleepiest-min) (cdr best))
+                (begin (set! best sleepiest-min) (set! guard k)))))
+    (* (string->number guard) (car best))
+)
+(all-guards-sleepiest-minute guard-data)
+
+
 
 
